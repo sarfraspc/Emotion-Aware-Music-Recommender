@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Mood - VibeCheck</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background elements */
+        .bg-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            width: 60px;
+            height: 60px;
+            top: 15%;
+            left: 10%;
+            animation-delay: -1s;
+        }
+
+        .shape:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            top: 65%;
+            right: 15%;
+            animation-delay: -3s;
+        }
+
+        .shape:nth-child(3) {
+            width: 50px;
+            height: 50px;
+            top: 80%;
+            left: 20%;
+            animation-delay: -2s;
+        }
+
+        .shape:nth-child(4) {
+            width: 70px;
+            height: 70px;
+            top: 25%;
+            right: 30%;
+            animation-delay: -4s;
+        }
+
+        .shape:nth-child(5) {
+            width: 45px;
+            height: 45px;
+            top: 45%;
+            left: 5%;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(6) {
+            width: 65px;
+            height: 65px;
+            top: 10%;
+            right: 40%;
+            animation-delay: -2.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .results-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px 32px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateY(20px);
+            animation: slideUp 0.8s ease-out forwards, pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3), 0 0 30px rgba(102, 126, 234, 0.15); }
+        }
+
+        .mood-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            animation: bounce 2s ease-in-out infinite;
+            display: block;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+
+        .title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 32px;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .user-text {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .user-text-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .user-text-content {
+            font-size: 16px;
+            color: #334155;
+            font-weight: 500;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .mood-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 20px 16px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        .metric:nth-child(1) { animation-delay: 0.2s; }
+        .metric:nth-child(2) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .metric-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        .metric-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .metric-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease-out;
+            animation: fillBar 1.5s ease-out forwards;
+        }
+
+        .valence-fill {
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+
+        .energy-fill {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        }
+
+        @keyframes fillBar {
+            from { width: 0%; }
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .back-btn:hover::before {
+            left: 100%;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+        }
+
+        .arrow-left {
+            transition: transform 0.3s ease;
+        }
+
+        .back-btn:hover .arrow-left {
+            transform: translateX(-3px);
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .results-card {
+                padding: 32px 24px;
+                max-width: 100%;
+            }
+            
+            .title {
+                font-size: 1.9rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .mood-icon {
+                font-size: 3.2rem;
+            }
+            
+            .user-text-content {
+                font-size: 15px;
+            }
+            
+            .mood-metrics {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .metric {
+                padding: 18px 16px;
+            }
+            
+            .back-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .results-card {
+                padding: 28px 24px;
+            }
+            
+            .mood-icon {
+                font-size: 3.2rem;
+                margin-bottom: 12px;
+            }
+            
+            .title {
+                font-size: 1.9rem;
+                margin-bottom: 6px;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 24px;
+            }
+            
+            .user-text {
+                padding: 16px;
+                margin-bottom: 20px;
+            }
+            
+            .mood-metrics {
+                margin-bottom: 24px;
+                gap: 12px;
+            }
+            
+            .metric {
+                padding: 16px 12px;
+            }
+        }
+    </style>
+
+    <!-- Animated background shapes -->
+<div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<div class="container">
+    <div class="results-card">
+        <span class="mood-icon">🎭</span>
+        <h1 class="title">Mood Detected</h1>
+        <p class="subtitle">Here's what we discovered about your vibe</p>
+        
+        <div class="user-text">
+            <div class="user-text-label">You said</div>
+            <div class="user-text-content">"{{ text }}"</div>
+        </div>
+        
+        <div class="mood-metrics">
+            <div class="metric">
+                <span class="metric-icon">😊</span>
+                <div class="metric-label">Valence</div>
+                <div class="metric-value">{{ valence }}%</div>
+                <div class="metric-bar">
+                    <div class="metric-fill valence-fill" style="width: {{ valence }}%"></div>
+                </div>
+            </div>
+            
+            <div class="metric">
+                <span class="metric-icon">⚡</span>
+                <div class="metric-label">Energy</div>
+                <div class="metric-value">{{ energy }}%</div>
+                <div class="metric-bar">
+                    <div class="metric-fill energy-fill" style="width: {{ energy }}%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <a href="{% url 'home' %}" class="back-btn">
+            <span class="arrow-left">←</span>
+            Back to VibeCheck
+        </a>
+    </div>
+    
+    <h2>🎵 Recommended Tracks</h2>
+    <div class="track-list">
+        {% for track in tracks %}
+            <div class="track-card">
+                <img src="{{ track.image }}" alt="{{ track.name }}" width="100">
+                <h3>{{ track.name }}</h3>
+                <p>by {{ track.artist }}</p>
+                {% if track.preview %}
+                    <audio controls src="{{ track.preview }}"></audio>
+                {% endif %}
+                <br>
+                <a href="{{ track.url }}" target="_blank">Open in Spotify</a>
+            </div>
+        {% empty %}
+            <p>No tracks found 😢</p>
+        {% endfor %}
+    </div>
+</div>
+
+    <script>
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate the metric bars
+            const fills = document.querySelectorAll('.metric-fill');
+            fills.forEach((fill, index) => {
+                setTimeout(() => {
+                    fill.style.width = fill.getAttribute('style').match(/width: (\d+)%/)[1] + '%';
+                }, 500 + (index * 200));
+            });
+            
+            // Add hover effect to metrics
+            const metrics = document.querySelectorAll('.metric');
+            metrics.forEach(metric => {
+                metric.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.15)';
+                });
+                
+                metric.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
